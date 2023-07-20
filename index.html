@@ -18,11 +18,11 @@
         <p class="lead">Just a simple site for QQ's late history 😀</p>
       </div>
       <div class="row g-5">
-        <div class="col-md-7 col-lg-8 order-md-last">
+        <div class="col-md-8 order-md-last">
           <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4>
           <div id="chart"></div>
         </div>
-        <div class="col-md 5 col-lg-4">
+        <div class="col-md-4">
           <h4 class="mb-3">Data List</h4>
           <ul class="list-group mb-3" id="table-body">
            
@@ -41,7 +41,7 @@
       .then((data) => {
         const tableData = data.map((item) => {
           const datetime = new Date(item.datetime);
-          const date = datetime.toLocaleDateString();
+          const date = datetime.toISOString().split('T')[0]
           const time = datetime.toLocaleTimeString();
 
           const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
