@@ -24,14 +24,14 @@
     </style>
   </head>
   <body>
-    <h1>小Q晚多少？</h1>
+    <h1>小Q晚了没？</h1>
     <div id="chart"></div>
     <table>
       <thead>
         <tr>
           <th>日期</th>
-          <th>时间</th>
-          <th>迟到分钟数</th>
+          <!-- <th>时间</th> -->
+          <th>分钟数</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
@@ -78,13 +78,13 @@
           for (let i = 0; i < tableData.length; i++) {
             const row = document.createElement('tr');
             const dateCell = document.createElement('td');
-            const timeCell = document.createElement('td');
+            // const timeCell = document.createElement('td');
             const lateMinutesCell = document.createElement('td');
             dateCell.textContent = tableData[i].date;
-            timeCell.textContent = tableData[i].time;
+            // timeCell.textContent = tableData[i].time;
             lateMinutesCell.textContent = tableData[i].lateMinutes;
             row.appendChild(dateCell);
-            row.appendChild(timeCell);
+            // row.appendChild(timeCell);
             row.appendChild(lateMinutesCell);
             tableBody.appendChild(row);
           }
