@@ -46,10 +46,14 @@
             const datetime = new Date(item.datetime);
             const date = datetime.toLocaleDateString();
             const time = datetime.toLocaleTimeString();
+
+            const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
+            const diffInMinutes = (datetime - targetTime) / 60000;
             return {
               date,
               time,
-              lateMinutes: item.lateMinutes
+              // lateMinutes: item.lateMinutes
+              lateMinutes: diffInMinutes
             };
           });
 
