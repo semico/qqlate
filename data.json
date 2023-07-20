@@ -1,0 +1,15 @@
+[
+    {
+      "datetime": "2022-01-01 09:15:00",
+      "lateMinutes": 15
+    },
+    {
+      "datetime": "2022-01-02 08:50:00",
+      "lateMinutes": 10
+    },
+    {
+      "datetime": "2022-01-03 09:05:00",
+      "lateMinutes": 5
+    }
+  ]
+  

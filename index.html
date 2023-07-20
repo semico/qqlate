@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>小Q晚多少？</title>
+    <meta charset="UTF-8">
+    <script src="chart.js"></script>
+    <style>
+      #chart {
+        width: 500px;
+        height: 300px;
+        margin-bottom: 30px;
+      }
+      tbody tr:nth-child(odd) {
+        background-color: lightgray;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: lightblue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>小Q晚多少？</h1>
+    <div id="chart"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>时间</th>
+          <th>迟到分钟数</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+
+    <script>
+      // 通过fetch函数异步读取JSON文件
+      fetch('data.json')
+        .then((response) => response.json())
+        .then((data) => {
+          const tableData = data.map((item) => {
+            const datetime = new Date(item.datetime);
+            const date = datetime.toLocaleDateString();
+            const time = datetime.toLocaleTimeString();
+            return {
+              date,
+              time,
+              lateMinutes: item.lateMinutes
+            };
+          });
+
+          // 生成折线图
+          const dates = tableData.map((item) => item.date);
+          const lateMinutes = tableData.map((item) => item.lateMinutes);
+          const chartOptions = {
+            chart: {
+              type: 'line',
+            },
+            series: [
+              {
+                name: '迟到分钟数',
+                data: lateMinutes,
+              },
+            ],
+            xaxis: {
+              categories: dates,
+            },
+          };
+          const chart = new ApexCharts(document.querySelector('#chart'), chartOptions);
+          chart.render();
+
+          // 生成表格数据
+          const tableBody = document.querySelector('#table-body');
+          for (let i = 0; i < tableData.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const timeCell = document.createElement('td');
+            const lateMinutesCell = document.createElement('td');
+            dateCell.textContent = tableData[i].date;
+            timeCell.textContent = tableData[i].time;
+            lateMinutesCell.textContent = tableData[i].lateMinutes;
+            row.appendChild(dateCell);
+            row.appendChild(timeCell);
+            row.appendChild(lateMinutesCell);
+            tableBody.appendChild(row);
+          }
+        });
+    </script>
+  </body>
+</html>
