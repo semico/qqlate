@@ -1,98 +1,100 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>小Q 晚多少？</title>
-    <meta charset="UTF-8">
-    <script src="chart.js"></script>
-    <style>
-      #chart {
-        width: 500px;
-        height: 300px;
-        margin-bottom: 30px;
-      }
-      tbody tr:nth-child(odd) {
-        background-color: lightgray;
-      }
-      th,
-      td {
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background-color: lightblue;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>小Q晚了没？</h1>
-    <div id="chart"></div>
-    <table>
-      <thead>
-        <tr>
-          <th>日期</th>
-          <!-- <th>时间</th> -->
-          <th>分钟数</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
 
-    <script>
-      // 通过fetch函数异步读取JSON文件
-      fetch('data.json')
-        .then((response) => response.json())
-        .then((data) => {
-          const tableData = data.map((item) => {
-            const datetime = new Date(item.datetime);
-            const date = datetime.toLocaleDateString();
-            const time = datetime.toLocaleTimeString();
+<head>
+  <title>小Q 晚多少？</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/bootstrap.min.css">
+  <script src="assets/chart.js"></script>
+</head>
 
-            const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
-            const diffInMinutes = (datetime - targetTime) / 60000;
-            return {
-              date,
-              time,
-              // lateMinutes: item.lateMinutes
-              lateMinutes: diffInMinutes
-            };
-          });
+<body>
+  <div class="container">
+    <main>
+      <div class="py-5 text-center">
+        <img src="assets/logo.svg" alt="" class="d-block mx-auto mb-4" width="72" height="57">
+        <h2>Is QQ Late?</h2>
+        <p class="lead">Just a simple site for QQ's late history 😀</p>
+      </div>
+      <div class="row g-5">
+        <div class="col-md-7 col-lg-8 order-md-last">
+          <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4>
+          <div id="chart"></div>
+        </div>
+        <div class="col-md 5 col-lg-4">
+          <h4 class="mb-3">Data List</h4>
+          <ul class="list-group mb-3" id="table-body">
+           
+          </ul>
+        </div>
+      </div>
+    </main>
 
-          // 生成折线图
-          const dates = tableData.map((item) => item.date);
-          const lateMinutes = tableData.map((item) => item.lateMinutes);
-          const chartOptions = {
-            chart: {
-              type: 'line',
-            },
-            series: [
-              {
-                name: '迟到分钟数',
-                data: lateMinutes,
-              },
-            ],
-            xaxis: {
-              categories: dates,
-            },
+  </div>
+
+  <script src="assets/bootstrap.min.js"></script>
+  <script>
+    // 通过fetch函数异步读取JSON文件
+    fetch('data.json')
+      .then((response) => response.json())
+      .then((data) => {
+        const tableData = data.map((item) => {
+          const datetime = new Date(item.datetime);
+          const date = datetime.toLocaleDateString();
+          const time = datetime.toLocaleTimeString();
+
+          const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
+          const diffInMinutes = (datetime - targetTime) / 60000;
+          return {
+            date,
+            time,
+            // lateMinutes: item.lateMinutes
+            lateMinutes: diffInMinutes
           };
-          const chart = new ApexCharts(document.querySelector('#chart'), chartOptions);
-          chart.render();
-
-          // 生成表格数据
-          const tableBody = document.querySelector('#table-body');
-          for (let i = 0; i < tableData.length; i++) {
-            const row = document.createElement('tr');
-            const dateCell = document.createElement('td');
-            // const timeCell = document.createElement('td');
-            const lateMinutesCell = document.createElement('td');
-            dateCell.textContent = tableData[i].date;
-            // timeCell.textContent = tableData[i].time;
-            lateMinutesCell.textContent = tableData[i].lateMinutes;
-            row.appendChild(dateCell);
-            // row.appendChild(timeCell);
-            row.appendChild(lateMinutesCell);
-            tableBody.appendChild(row);
-          }
         });
-    </script>
-  </body>
+
+        // 生成折线图
+        const dates = tableData.map((item) => item.date);
+        const lateMinutes = tableData.map((item) => item.lateMinutes);
+        const chartOptions = {
+          chart: {
+            type: 'line',
+          },
+          series: [
+            {
+              name: '迟到分钟数',
+              data: lateMinutes,
+            },
+          ],
+          xaxis: {
+            categories: dates,
+          },
+        };
+        const chart = new ApexCharts(document.querySelector('#chart'), chartOptions);
+        chart.render();
+
+        // 生成表格数据
+
+        const tableBody = document.querySelector('#table-body');
+        for (let i = 0; i < tableData.length; i++) {
+          const row = document.createElement('li');
+          row.className = 'list-group-item d-flex justify-content-between';
+
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = tableData[i].date;
+
+          const minutesStrong = document.createElement('strong');
+          minutesStrong.textContent = `${tableData[i].lateMinutes} mins`;
+
+          row.appendChild(dateSpan);
+          row.appendChild(minutesStrong);
+          tableBody.appendChild(row);
+        }
+
+
+      });
+  </script>
+</body>
+
 </html>
