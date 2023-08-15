@@ -6,57 +6,80 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="assets/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/style.css">
   <script src="assets/chart.js"></script>
+
 </head>
 
 <body>
+
+
+
+
   <div class="container mx-auto p-4">
     <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
       <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
-        <img src="assets/logo.svg" alt="" class="bi me-2" width="40" height="32">
+        <img src="assets/run.gif" alt="" class="bi me-2" width="40">
         <span class="fs-4">Is QQ Late? - Just a simple site for QQ's late history 😀</span>
       </a>
     </header>
     <main>
       <div class="row g-5">
-        <div class="col-md-7 col-lg-9 order-md-last">
+        <div class="col-md-7 col-lg-8 order-md-last">
           <!-- <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4> -->
-          <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'Chart')">Chart</button>
-            <button class="tablinks" onclick="openTab(event, 'Heatmap')">Heatmap</button>
+          <div class="navbar">
+
+            <ul class="nav nav-underline" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="bar-tab" data-bs-toggle="tab" data-bs-target="#bar-tab-pane"
+                  type="button" role="tab" aria-controls="bar-tab-pane" aria-selected="true">Bar&nbsp;Chart</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#heatmap-tab-pane"
+                  type="button" role="tab" aria-controls="heatmap-tab-pane" aria-selected="false">Heatmap</button>
+              </li>
+
+            </ul>
+            <form class="d-flex" role="search">
+              <select name="" id="months-select" class="form-select">
+                <option value="all">All</option>
+              </select>
+            </form>
           </div>
-          <div id="Chart" class="tabcontent">
-            <div id="chart"></div>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="bar-tab-pane" role="tabpanel" aria-labelledby="bar-tab"
+              tabindex="0">
+              <div id="chart"></div>
+            </div>
+            <div class="tab-pane fade" id="heatmap-tab-pane" role="tabpanel" aria-labelledby="heatmap" tabindex="0">
+              <div id="heatmap"></div>
+            </div>
           </div>
-          <div id="Heatmap" class="tabcontent">
-            <div id="heatmap"></div>
-          </div>
-          <script>
-            function openTab(evt, tabName) {
-              var i, tabcontent, tablinks;
-              tabcontent = document.getElementsByClassName("tabcontent");
-              for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-              }
-              tablinks = document.getElementsByClassName("tablinks");
-              for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-              }
-              document.getElementById(tabName).style.display = "block";
-              evt.currentTarget.className += " active";
-            }
-            openTab(event, 'Chart')
-          </script>
 
         </div>
-        <div class="col-md-5 col-lg-3">
-          <img src="assets/run.gif" class="d-block mx-auto mb-4" alt="" width="100%">
-          <!-- <h4 class="mb-3">Data List</h4> -->
-          <h4 class="mb-3">Months</h4>
-          <select name="" id="months-select" class="form-select">
-            <option value="all">All</option>
-          </select>
-          <ul class="list-group mb-3" id="table-body">
+        <div class="col-md-5 col-lg-4">
+          <div class="calcon">
+            <div class="header">
+              <h4 id="month"></h4>
+              <div>
+                <button id="btnBack" class="btn btn-outline-primary">
+                  &lt; </button>
+                <button id="btnNext" class="btn btn-outline-primary"> &gt; </button>
+              </div>
+            </div>
+            <div class="weekdays cgrid">
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+              <div>Sun</div>
+            </div>
+            <div id="calendar" class="cgrid"></div>
+          </div>
+
+          <ul class="list-group mb-3 hidden" id="table-body">
 
           </ul>
         </div>
@@ -66,6 +89,7 @@
   </div>
 
   <script src="assets/bootstrap.min.js"></script>
+  <script src="assets/calendar.js"></script>
   <script>
 
     // 通过fetch函数异步读取JSON文件
@@ -81,6 +105,7 @@
         const chartOptions = {
           chart: {
             type: 'bar',
+            toolbar: { show: false }
           },
           series: [
             {
@@ -121,7 +146,7 @@
           chart: {
             height: 250,
             type: 'heatmap',
-            toolbar: {show: false},
+            toolbar: { show: false },
           },
           stroke: {
             width: 0
@@ -163,13 +188,16 @@
             decimalsInFloat: 0,
             tickAmount: 31,
             tickPlacement: 'on',
-          }, 
+          },
           legend: {
             show: false
           },
         };
         const heatmap = new ApexCharts(document.querySelector("#heatmap"), heatmapOptions);
         heatmap.render();
+
+        events = (dataConv(data));
+        loadCalendar();
 
 
 
@@ -207,21 +235,8 @@
       });
 
     function generate(data, cchart, heatmap) {
-      console.log(data);
-      const tableData = data.map((item) => {
-        const datetime = new Date(item.datetime);
-        const date = datetime.toISOString().split('T')[0]
-        const time = datetime.toLocaleTimeString();
-
-        const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
-        const diffInMinutes = (datetime - targetTime) / 60000;
-        return {
-          date,
-          time,
-          // lateMinutes: item.lateMinutes
-          lateMinutes: diffInMinutes
-        };
-      });
+      // console.log(data);
+      const tableData = dataConv(data);
 
       const dates = tableData.map((item) => item.date);
       const lateMinutes = tableData.map((item) => item.lateMinutes);
@@ -265,8 +280,8 @@
 
       heatmap.updateSeries(formattedData);
       heatmap.updateOptions({
-        chart:{
-          height:formattedData.length * 30 + 70,
+        chart: {
+          height: formattedData.length * 30 + 70,
         }
       });
 
@@ -299,6 +314,26 @@
 
     }
 
+    // events = [{date: "2023-08-11", title:"test event"}];
+    // loadCalendar();
+    function dataConv(data) {
+      const tableData = data.map((item) => {
+        const datetime = new Date(item.datetime);
+        const date = datetime.toISOString().split('T')[0]
+        const time = datetime.toLocaleTimeString();
+
+        const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
+        const diffInMinutes = (datetime - targetTime) / 60000;
+        return {
+          date,
+          time,
+          // lateMinutes: item.lateMinutes
+          lateMinutes: diffInMinutes,
+          note: item.note
+        };
+      });
+      return tableData;
+    }
 
   </script>
 </body>

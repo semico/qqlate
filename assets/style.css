@@ -1,0 +1,116 @@
+/* .calcon {width: 770px;} */
+#table-body {
+  display: none;
+}
+
+.cgrid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cgrid>div {
+  /* flex: 1 0 14.28%; 100% divided by 7 columns */
+  width: 14.28%;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.header {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.calcon button {
+  width: 45px;
+}
+
+
+
+.weekdays {
+  background-color: #2f3640;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.weekdays div {
+  padding: 10px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#calendar {
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.day {
+  /* width: 100px; */
+  font-size: 12px;
+  height: 65px;
+  cursor: pointer;
+  /* margin: 5px; */
+  box-sizing: border-box;
+  box-shadow: 0px 0px 3px #cbd4c2;
+  color: #7f8fa6;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.day:hover {
+  background-color: rgba(112, 111, 211, 0.1);
+  color: #706fd3;
+}
+
+#currentDay {
+  background-color: #e5e5e5;
+  color: #fff;
+}
+
+.event {
+  flex: 1;
+  font-size: 14px;
+  padding: 3px;
+  color: #00df4a;
+  /* color: #fff; */
+  border-radius: 5px;
+  max-height: 55px;
+  overflow: hidden;
+  text-align: center;
+  margin: 0 -5px;
+}
+
+.event span {
+  display: block;
+  background-color: #dedede;
+  color: #3d3d3d;
+  font-size: 10px;
+}
+
+.event.little {
+  color: #FFB200;
+}
+
+.event.much {
+  color: #F15B46;
+}
+
+.event.more {
+  color: #FF0000;
+}
+
+.event.holiday {
+  background-color: palegreen;
+  color: #3d3d3d;
+}
+
+.plain {
+  cursor: default;
+  box-shadow: none;
+}
