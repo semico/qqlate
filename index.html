@@ -22,13 +22,17 @@
         <div class="col-md-7 col-lg-9 order-md-last">
           <!-- <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4> -->
           <div id="chart"></div>
-          
+
         </div>
         <div class="col-md-5 col-lg-3">
           <img src="assets/run.gif" class="d-block mx-auto mb-4" alt="" width="100%">
           <!-- <h4 class="mb-3">Data List</h4> -->
+          <h4 class="mb-3">Months</h4>
+          <select name="" id="months-select" class="form-select">
+            <option value="all">All</option>
+          </select>
           <ul class="list-group mb-3" id="table-body">
-           
+
           </ul>
         </div>
       </div>
@@ -38,28 +42,17 @@
 
   <script src="assets/bootstrap.min.js"></script>
   <script>
+
     // 通过fetch函数异步读取JSON文件
     fetch('data.json')
       .then((response) => response.json())
       .then((data) => {
-        const tableData = data.map((item) => {
+        const months = [...new Set(data.map((item) => {
           const datetime = new Date(item.datetime);
-          const date = datetime.toISOString().split('T')[0]
-          const time = datetime.toLocaleTimeString();
-
-          const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
-          const diffInMinutes = (datetime - targetTime) / 60000;
-          return {
-            date,
-            time,
-            // lateMinutes: item.lateMinutes
-            lateMinutes: diffInMinutes
-          };
-        });
+          return datetime.toLocaleString('default', { month: 'long' });
+        }))];
 
         // 生成折线图
-        const dates = tableData.map((item) => item.date);
-        const lateMinutes = tableData.map((item) => item.lateMinutes);
         const chartOptions = {
           chart: {
             type: 'bar',
@@ -67,57 +60,120 @@
           series: [
             {
               name: 'Minutes',
-              data: lateMinutes,
+              data: [],
             },
           ],
           xaxis: {
             type: 'datetime',
-            categories: dates,
+            categories: [],
           },
           plotOptions: {
-          bar: {
-            colors: {
-              ranges: [{
-                from: 41,
-                to: 100,
-                color: '#FF0000'
-              }, {
-                from: 16,
-                to: 40,
-                color: '#F15B46'
-              }, {
-                from: 0,
-                to: 15,
-                color: '#FFB200'
-              }]
-            },
-            columnWidth: '80%',
-          }
-        },
+            bar: {
+              colors: {
+                ranges: [{
+                  from: 41,
+                  to: 100,
+                  color: '#FF0000'
+                }, {
+                  from: 16,
+                  to: 40,
+                  color: '#F15B46'
+                }, {
+                  from: 0,
+                  to: 15,
+                  color: '#FFB200'
+                }]
+              },
+              columnWidth: '80%',
+            }
+          },
         };
         const chart = new ApexCharts(document.querySelector('#chart'), chartOptions);
         chart.render();
 
-        // 生成表格数据
 
-        const tableBody = document.querySelector('#table-body');
-        for (let i = 0; i < tableData.length; i++) {
-          const row = document.createElement('li');
-          row.className = 'list-group-item d-flex justify-content-between';
 
-          const dateSpan = document.createElement('span');
-          dateSpan.textContent = tableData[i].date;
+        generate(data, chart);
 
-          const minutesStrong = document.createElement('strong');
-          minutesStrong.textContent = `${tableData[i].lateMinutes} mins`;
+        // Create a select element for the months list
+        const monthsSelect = document.querySelector('#months-select');
+        // Create an option for each unique month
+        months.forEach((month) => {
+          const monthOption = document.createElement('option');
+          monthOption.value = month;
+          monthOption.textContent = month;
+          monthsSelect.appendChild(monthOption);
+        });
 
-          row.appendChild(dateSpan);
-          row.appendChild(minutesStrong);
-          tableBody.appendChild(row);
-        }
 
+        // Event listener for the select control
+        monthsSelect.addEventListener('change', function () {
+          const selectedMonth = this.value;
+          // Clear the table body
+          document.querySelector('#table-body').innerHTML = '';
+
+          // Filter the data based on the selected month
+          const filteredData = data.filter((item) => {
+            const datetime = new Date(item.datetime);
+            const month = datetime.toLocaleString('default', { month: 'long' });
+            return selectedMonth === 'all' || month === selectedMonth;
+          });
+
+          // Generate the table data for the filtered data
+          // generateTableData(filteredData);
+          generate(filteredData, chart);
+        });
 
       });
+
+    function generate(data, cchart) {
+      const tableData = data.map((item) => {
+        const datetime = new Date(item.datetime);
+        const date = datetime.toISOString().split('T')[0]
+        const time = datetime.toLocaleTimeString();
+
+        const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
+        const diffInMinutes = (datetime - targetTime) / 60000;
+        return {
+          date,
+          time,
+          // lateMinutes: item.lateMinutes
+          lateMinutes: diffInMinutes
+        };
+      });
+
+      const dates = tableData.map((item) => item.date);
+      const lateMinutes = tableData.map((item) => item.lateMinutes);
+      cchart.updateSeries([{
+        name: 'Minutes',
+        data: lateMinutes,
+      }]);
+      cchart.updateOptions({
+        xaxis: {
+          categories: dates,
+        },
+      });
+
+      // 生成表格数据
+
+      const tableBody = document.querySelector('#table-body');
+      for (let i = 0; i < tableData.length; i++) {
+        const row = document.createElement('li');
+        row.className = 'list-group-item d-flex justify-content-between';
+
+        const dateSpan = document.createElement('span');
+        dateSpan.textContent = tableData[i].date;
+
+        const minutesStrong = document.createElement('strong');
+        minutesStrong.textContent = `${tableData[i].lateMinutes} mins`;
+
+        row.appendChild(dateSpan);
+        row.appendChild(minutesStrong);
+        tableBody.appendChild(row);
+      }
+
+
+    }
   </script>
 </body>
 
