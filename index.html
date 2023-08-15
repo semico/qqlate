@@ -160,7 +160,9 @@
           },
           xaxis: {
             type: 'numeric',
-            decimalsInFloat: 0
+            decimalsInFloat: 0,
+            tickAmount: 31,
+            tickPlacement: 'on',
           }, 
           legend: {
             show: false
@@ -262,11 +264,11 @@
 
 
       heatmap.updateSeries(formattedData);
-      // heatmap.updateOptions({
-      //   chart:{
-      //     height:150,
-      //   }
-      // });
+      heatmap.updateOptions({
+        chart:{
+          height:formattedData.length * 30 + 70,
+        }
+      });
 
 
 
