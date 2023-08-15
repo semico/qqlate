@@ -21,7 +21,32 @@
       <div class="row g-5">
         <div class="col-md-7 col-lg-9 order-md-last">
           <!-- <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4> -->
-          <div id="chart"></div>
+          <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Chart')">Chart</button>
+            <button class="tablinks" onclick="openTab(event, 'Heatmap')">Heatmap</button>
+          </div>
+          <div id="Chart" class="tabcontent">
+            <div id="chart"></div>
+          </div>
+          <div id="Heatmap" class="tabcontent">
+            <div id="heatmap"></div>
+          </div>
+          <script>
+            function openTab(evt, tabName) {
+              var i, tabcontent, tablinks;
+              tabcontent = document.getElementsByClassName("tabcontent");
+              for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+              }
+              tablinks = document.getElementsByClassName("tablinks");
+              for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+              }
+              document.getElementById(tabName).style.display = "block";
+              evt.currentTarget.className += " active";
+            }
+            openTab(event, 'Chart')
+          </script>
 
         </div>
         <div class="col-md-5 col-lg-3">
@@ -91,9 +116,62 @@
         const chart = new ApexCharts(document.querySelector('#chart'), chartOptions);
         chart.render();
 
+        const heatmapOptions = {
+          series: [],
+          chart: {
+            height: 250,
+            type: 'heatmap',
+            toolbar: {show: false},
+          },
+          stroke: {
+            width: 0
+          },
+          plotOptions: {
+            heatmap: {
+              radius: 0,
+              enableShades: false,
+              colorScale: {
+                ranges: [{
+                  from: 41,
+                  to: 100,
+                  color: '#FF0000'
+                }, {
+                  from: 16,
+                  to: 40,
+                  color: '#F15B46'
+                }, {
+                  from: 0,
+                  to: 15,
+                  color: '#FFB200'
+                },
+                {
+                  from: null,
+                  to: null,
+                  color: '#eee'
+                }],
+              },
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            style: {
+              colors: ['#fff']
+            }
+          },
+          xaxis: {
+            type: 'numeric',
+            decimalsInFloat: 0
+          }, 
+          legend: {
+            show: false
+          },
+        };
+        const heatmap = new ApexCharts(document.querySelector("#heatmap"), heatmapOptions);
+        heatmap.render();
 
 
-        generate(data, chart);
+
+        generate(data, chart, heatmap);
 
         // Create a select element for the months list
         const monthsSelect = document.querySelector('#months-select');
@@ -121,12 +199,13 @@
 
           // Generate the table data for the filtered data
           // generateTableData(filteredData);
-          generate(filteredData, chart);
+          generate(filteredData, chart, heatmap);
         });
 
       });
 
-    function generate(data, cchart) {
+    function generate(data, cchart, heatmap) {
+      console.log(data);
       const tableData = data.map((item) => {
         const datetime = new Date(item.datetime);
         const date = datetime.toISOString().split('T')[0]
@@ -154,8 +233,51 @@
         },
       });
 
-      // 生成表格数据
+      // Group the data by month
+      const groupedData = tableData.reduce((acc, item) => {
+        const datetime = new Date(item.date);
+        const monthYear = `${datetime.getFullYear()} ${datetime.toLocaleString('default', { month: 'long' })}`;
 
+        if (!acc[monthYear]) {
+          acc[monthYear] = Array(31).fill(null);
+        }
+
+        acc[monthYear][datetime.getDate() - 1] = item.lateMinutes;
+        // acc[monthYear].push(item.lateMinutes);
+        return acc;
+      }, {});
+
+      // Convert the grouped data into the desired format
+      const formattedData = Object.entries(groupedData).map(([name, data]) => {
+        // Initialize an array of 31 elements for each month
+        const monthData = Array(31).fill(null);
+        data.forEach((item, index) => {
+          if (item !== null) {
+            // Subtract 1 from the index to match array index (0-30)
+            monthData[index] = item;
+          }
+        });
+        return { name, data: monthData };
+      });
+
+
+      heatmap.updateSeries(formattedData);
+      // heatmap.updateOptions({
+      //   chart:{
+      //     height:150,
+      //   }
+      // });
+
+
+
+
+
+
+
+
+
+
+      // Generate table data
       const tableBody = document.querySelector('#table-body');
       for (let i = 0; i < tableData.length; i++) {
         const row = document.createElement('li');
@@ -174,6 +296,8 @@
 
 
     }
+
+
   </script>
 </body>
 
