@@ -1,0 +1,5 @@
+﻿{
+  "Description": "Domain ownership verification file for Microsoft 365 - place in the website root",
+  "Domain": "q2go.cn",
+  "Id": "b8918dcc-4e47-4823-9b58-1e88db0b7353"
+}
