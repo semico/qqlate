@@ -79,6 +79,8 @@
             <div id="calendar" class="cgrid"></div>
           </div>
 
+          <h5 id="average"></h5>
+
           <ul class="list-group mb-3 hidden" id="table-body">
 
           </ul>
@@ -310,6 +312,12 @@
         row.appendChild(minutesStrong);
         tableBody.appendChild(row);
       }
+        // Calculate the average of tableData.lateMinutes
+        const totalMinutes = tableData.reduce((total, item) => total + item.lateMinutes, 0);
+        const averageMinutes = totalMinutes / tableData.length;
+        // console.log(`Average late minutes: ${averageMinutes}`);
+        document.querySelector('#average').textContent = `Average: ${averageMinutes} mins`;
+      
 
 
     }
