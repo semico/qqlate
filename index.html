@@ -314,7 +314,7 @@
       }
         // Calculate the average of tableData.lateMinutes
         const totalMinutes = tableData.reduce((total, item) => total + item.lateMinutes, 0);
-        const averageMinutes = totalMinutes / tableData.length;
+        const averageMinutes = parseFloat((totalMinutes / tableData.length).toFixed(2));
         // console.log(`Average late minutes: ${averageMinutes}`);
         document.querySelector('#average').textContent = `Average: ${averageMinutes} mins`;
       
