@@ -313,10 +313,11 @@
         tableBody.appendChild(row);
       }
         // Calculate the average of tableData.lateMinutes
-        const totalMinutes = tableData.reduce((total, item) => total + item.lateMinutes, 0);
-        const averageMinutes = parseFloat((totalMinutes / tableData.length).toFixed(2));
+        const totalMinutes = tableData.reduce((total, item) => item.lateMinutes > 0 ? total + item.lateMinutes : total, 0);
+        const count = tableData.reduce((count, item) => item.lateMinutes > 0 ? count + 1 : count, 0);
+        const averageMinutes = parseFloat((totalMinutes / count).toFixed(2));
         // console.log(`Average late minutes: ${averageMinutes}`);
-        document.querySelector('#average').textContent = `Average: ${averageMinutes} mins`;
+        document.querySelector('#average').textContent = `${totalMinutes} | ${count} | ${averageMinutes}`;
       
 
 
