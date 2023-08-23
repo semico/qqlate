@@ -26,7 +26,7 @@
     <main>
       <div class="row g-5">
         <div class="col-md-7 col-lg-8 order-md-last">
-          <!-- <h4 class="d-flex justify-content-between align-items-center mb-3">Chart</h4> -->
+          <h4 class="d-flex justify-content-between align-items-center mb-3" id="average"></h4>
           <div class="navbar">
 
             <ul class="nav nav-underline" id="myTab" role="tablist">
@@ -41,6 +41,7 @@
 
             </ul>
             <form class="d-flex" role="search">
+              
               <select name="" id="months-select" class="form-select">
                 <option value="all">All</option>
               </select>
@@ -79,7 +80,7 @@
             <div id="calendar" class="cgrid"></div>
           </div>
 
-          <h5 id="average"></h5>
+          
 
           <ul class="list-group mb-3 hidden" id="table-body">
 
@@ -317,7 +318,7 @@
         const count = tableData.reduce((count, item) => item.lateMinutes > 0 ? count + 1 : count, 0);
         const averageMinutes = parseFloat((totalMinutes / count).toFixed(2));
         // console.log(`Average late minutes: ${averageMinutes}`);
-        document.querySelector('#average').textContent = `${totalMinutes} | ${count} | ${averageMinutes}`;
+        document.querySelector('#average').textContent = `Total: ${totalMinutes} mins | Count: ${count} | Average: ${averageMinutes} mins`;
       
 
 
