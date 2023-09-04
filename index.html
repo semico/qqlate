@@ -94,11 +94,23 @@
   <script src="assets/bootstrap.min.js"></script>
   <script src="assets/calendar.js"></script>
   <script>
-
-    // 通过fetch函数异步读取JSON文件
-    fetch('data.json')
+    // Fetch data from strai API
+    fetch('https://myapi.huyubo.cn/api/qq-lates?pagination[pageSize]=300')
       .then((response) => response.json())
-      .then((data) => {
+      .then((apiData) => {
+        const data = apiData.data.map(item => {
+          return {
+            datetime: item.attributes.datetime,
+            note: item.attributes.note
+          };
+        });
+        console.log(data);
+    //   });
+
+    // // 通过fetch函数异步读取JSON文件
+    // fetch('data.json')
+    //   .then((response) => response.json())
+    //   .then((data) => {
         const months = [...new Set(data.map((item) => {
           const datetime = new Date(item.datetime);
           return datetime.toLocaleString('default', { month: 'long' });
@@ -331,15 +343,21 @@
         const datetime = new Date(item.datetime);
         const date = datetime.toISOString().split('T')[0]
         const time = datetime.toLocaleTimeString();
+        let note = item.note
 
         const targetTime = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), 9, 0, 0);
-        const diffInMinutes = (datetime - targetTime) / 60000;
+        let diffInMinutes = Math.floor((datetime - targetTime) / 60000);
+        if (diffInMinutes > 180) {
+          diffInMinutes = diffInMinutes - 240;
+          note = "PM\n" + note;
+        }
+        
         return {
           date,
           time,
           // lateMinutes: item.lateMinutes
           lateMinutes: diffInMinutes,
-          note: item.note
+          note: note
         };
       });
       return tableData;
